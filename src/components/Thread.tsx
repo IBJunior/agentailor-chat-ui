@@ -1,64 +1,19 @@
-import { useState } from "react";
 import { MessageInput } from "./MessageInput";
 import MessageList from "./MessageList";
-import type { Message, MessageDto } from "@/types/message";
+import { useThread } from "@/contexts/ThreadContext";
+import { Loader2 } from "lucide-react";
 
 export const Thread = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [threadId] = useState("default");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, isLoading, isLoadingHistory, sendMessage } = useThread();
 
-  const handleSendMessage = async (messageText: string) => {
-    setIsLoading(true);
-    try {
-      // Add user message to the chat
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        type: 'human',
-        content: [{ type: 'text', text: messageText }]
-      };
-      setMessages(prev => [...prev, userMessage]);
-
-      const messageDto: MessageDto = {
-        threadId,
-        type: 'human',
-        content: [
-          {
-            type: 'text',
-            text: messageText
-          }
-        ]
-      };
-
-      const response = await fetch('http://localhost:3001/api/agent/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(messageDto),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const data = await response.json();
-      
-      // Add AI response to the chat
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: data.type,
-        content: Array.isArray(data.content) ? data.content : [{ type: 'text', text: String(data.content) }]
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      
-    } catch (error) {
-      console.error('Error sending message:', error);
-      // You might want to show an error notification here
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (isLoadingHistory) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="mt-2 text-gray-500">Loading conversation history...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -75,7 +30,7 @@ export const Thread = () => {
       </div>
 
       <div className="flex justify-center p-4 border-t border-gray-200 dark:border-gray-800 bg-background/50 backdrop-blur-sm">
-        <MessageInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
       </div>
     </div>
   );
