@@ -16,3 +16,9 @@ export interface Message {
   type: 'human' | 'ai' | 'tool';
   content: MessageContentDto[];
 }
+
+export interface SseMessageData {
+  id: string;
+  type: 'ai' | 'tool';
+  content: string;
+}

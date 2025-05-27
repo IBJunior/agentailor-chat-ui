@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Message, MessageDto } from "@/types/message";
-import { fetchMessageHistory, sendMessage as sendMessageApi } from "@/services/messageService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useRef, useEffect, useState } from "react";
+import type { Message, MessageDto, SseMessageData, MessageContentDto } from "@/types/message";
+import { fetchMessageHistory, createMessageStream, closeMessageStream } from "@/services/messageService";
 
 interface UseMessagesReturn {
   messages: Message[];
@@ -14,6 +15,10 @@ interface UseMessagesReturn {
 
 export function useMessages(threadId: string): UseMessagesReturn {
   const queryClient = useQueryClient();
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const currentMessageRef = useRef<Message | null>(null);
+  const [sendError, setSendError] = useState<Error | null>(null);
+  const [isSending, setIsSending] = useState(false);
 
   // Query for message history
   const { 
@@ -26,47 +31,104 @@ export function useMessages(threadId: string): UseMessagesReturn {
     queryFn: () => fetchMessageHistory(threadId)
   });
 
-  // Mutation for sending messages
-  const { 
-    mutateAsync: sendMessageMutation, 
-    isPending: isSending,
-    error: sendError 
-  } = useMutation({
-    mutationFn: async (messageText: string) => {
-      // Optimistically add user message
+  const sendMessage = useCallback(async (messageText: string): Promise<void> => {
+    setIsSending(true);
+    setSendError(null);
+    
+    try {
+      // Add user message to the chat immediately
       const userMessage: Message = {
         id: Date.now().toString(),
         type: 'human',
         content: [{ type: 'text', text: messageText }]
       };
-
-      // Update cache immediately with user message
       queryClient.setQueryData(['messages', threadId], (old: Message[] = []) => [...old, userMessage]);
 
-      // Send message to API
-      const messageDto: MessageDto = {
-        threadId,
-        type: 'human',
-        content: [{ type: 'text', text: messageText }]
+      // Close any existing stream
+      if (eventSourceRef.current) {
+        closeMessageStream(eventSourceRef.current);
+      }
+
+      // Create new stream
+      const eventSource = createMessageStream(threadId, messageText);
+      eventSourceRef.current = eventSource;
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data) as SseMessageData;
+
+          // If we don't have a current message or the ID changed, create a new message
+          if (!currentMessageRef.current || currentMessageRef.current.id !== data.id) {
+            const newContent: MessageContentDto = { type: 'text', text: data.content };
+            currentMessageRef.current = {
+              id: data.id,
+              type: data.type,
+              content: [newContent]
+            };
+            // Add new message to the chat
+            queryClient.setQueryData(['messages', threadId], (old: Message[] = []) => [...old, currentMessageRef.current!]);
+          } else {
+            // Update existing message content by appending new content
+            const updatedContent: MessageContentDto = {
+              type: 'text',
+              text: currentMessageRef.current.content[0].text + data.content
+            };
+            
+            const updatedMessage: Message = {
+              ...currentMessageRef.current,
+              content: [updatedContent]
+            };
+            currentMessageRef.current = updatedMessage;
+
+            // Update the message in the chat
+            queryClient.setQueryData(['messages', threadId], (old: Message[] = []) => {
+              const index = old.findIndex(msg => msg.id === data.id);
+              if (index === -1) return old;
+              const newMessages = [...old];
+              newMessages[index] = updatedMessage;
+              return newMessages;
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing SSE message:', error, event.data);
+        }
       };
 
-      const response = await sendMessageApi(messageDto);
+      eventSource.onerror = (error) => {
+        console.error('SSE Error:', error);
+        setSendError(new Error('Failed to receive message stream'));
+        setIsSending(false);
+        currentMessageRef.current = null;
+        if (eventSourceRef.current) {
+          closeMessageStream(eventSourceRef.current);
+          eventSourceRef.current = null;
+        }
+      };
 
-      // Update cache with AI response
-      queryClient.setQueryData(['messages', threadId], (old: Message[] = []) => [...old, response]);
+      // Handle stream end
+      eventSource.addEventListener('done', () => {
+        setIsSending(false);
+        currentMessageRef.current = null;
+        closeMessageStream(eventSource);
+        eventSourceRef.current = null;
+      });
 
-      return response;
-    },
-    onError: (error) => {
+    } catch (error) {
       console.error('Error sending message:', error);
-      // Roll back the optimistic update
-      queryClient.invalidateQueries({ queryKey: ['messages', threadId] });
+      setSendError(error as Error);
+      setIsSending(false);
+      currentMessageRef.current = null;
     }
-  });
+  }, [threadId, queryClient]);
 
-  const sendMessage = async (messageText: string): Promise<void> => {
-    await sendMessageMutation(messageText);
-  };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        closeMessageStream(eventSourceRef.current);
+      }
+    };
+  }, []);
 
   const refetchMessages = async (): Promise<void> => {
     await refetch();
@@ -77,7 +139,7 @@ export function useMessages(threadId: string): UseMessagesReturn {
     isLoadingHistory,
     isSending,
     historyError: historyError as Error | null,
-    sendError: sendError as Error | null,
+    sendError,
     sendMessage,
     refetchMessages
   };

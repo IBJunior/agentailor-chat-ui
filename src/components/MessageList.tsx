@@ -8,9 +8,9 @@ interface MessageListProps {
 const MessageList = ({ messages }: MessageListProps) => {
   return (
     <div className="w-full max-w-3xl mx-auto px-4 space-y-4">
-      {messages.map((message) => (
+      {messages.map((message,index) => (
         <div
-          key={message.id}
+          key={index}
           className={`flex gap-3 ${
             message.type === "human" ? "justify-end" : "justify-start"
           }`}
