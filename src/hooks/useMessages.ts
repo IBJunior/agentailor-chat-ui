@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useEffect, useState } from "react";
-import type { Message, MessageDto, SseMessageData, MessageContentDto } from "@/types/message";
+import type { Message, SseMessageData, MessageContentDto } from "@/types/message";
 import { fetchMessageHistory, createMessageStream, closeMessageStream } from "@/services/messageService";
 
 interface UseMessagesReturn {
