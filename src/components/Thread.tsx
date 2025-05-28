@@ -29,7 +29,7 @@ export const Thread = () => {
         )}
       </div>
 
-      <div className="flex justify-center p-4 border-t border-gray-200 dark:border-gray-800 bg-background/50 backdrop-blur-sm">
+      <div className="flex justify-center items-center py-8">
         <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
       </div>
     </div>

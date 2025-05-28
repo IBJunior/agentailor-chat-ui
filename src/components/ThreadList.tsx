@@ -15,7 +15,7 @@ export function ThreadList() {
     }
   };
   return (
-    <div className="w-64 h-full bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className="flex flex-col">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={handleCreateThread}

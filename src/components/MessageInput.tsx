@@ -25,7 +25,7 @@ export const MessageInput = ({ onSendMessage, isLoading = false }: MessageInputP
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message..."
-            className="w-full resize-none rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-sm p-6 focus:outline-none focus:ring-0 min-h-[60px] max-h-[200px] pr-16 transition-all duration-200 ease-in-out placeholder:text-gray-400 dark:placeholder:text-gray-500 border"
+            className="w-full resize-none rounded-2xl bg-gray-100/50   p-6 focus:outline-none focus:ring-0 min-h-[60px] max-h-[200px] pr-16 transition-all duration-200 ease-in-out  border dark:text-black"
             rows={1}
             disabled={isLoading}
             onKeyDown={(e) => {
