@@ -1,17 +1,18 @@
 "use client";
-import { Header } from "@/components/Header";
 import { Thread } from "@/components/Thread";
+import { MainLayout } from "@/components/MainLayout";
 import { ThreadProvider } from "@/contexts/ThreadContext";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const threadId = searchParams.get("thread");
+
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <Header title="Agent Chat" />
-      <main className="flex-1 flex flex-col overflow-hidden mt-20">
-        <ThreadProvider>
-          <Thread />
-        </ThreadProvider>
-      </main>
-    </div>
+    <MainLayout>
+      <ThreadProvider threadId={threadId ?? undefined}>
+        <Thread />
+      </ThreadProvider>
+    </MainLayout>
   );
 }

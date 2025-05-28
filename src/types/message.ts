@@ -22,3 +22,11 @@ export interface SseMessageData {
   type: 'ai' | 'tool';
   content: string;
 }
+
+export interface Thread {
+  id: string;
+  title?: string;
+  lastMessage?: string;
+  createdAt: string;
+  updatedAt: string;
+}

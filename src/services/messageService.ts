@@ -1,4 +1,4 @@
-import type { Message, MessageDto } from "@/types/message";
+import type { Message, MessageDto, Thread } from "@/types/message";
 
 const API_BASE_URL = 'http://localhost:3001/api/agent';
 
@@ -44,4 +44,22 @@ export function createMessageStream(threadId: string, message: string): EventSou
 
 export async function closeMessageStream(eventSource: EventSource) {
     eventSource.close();
+}
+
+export async function fetchThreads(): Promise<Thread[]> {
+    const response = await fetch(`${API_BASE_URL}/threads`);
+    if (!response.ok) {
+        throw new Error('Failed to load threads');
+    }
+    return await response.json();
+}
+
+export async function createNewThread(): Promise<Thread> {
+    const response = await fetch(`${API_BASE_URL}/threads`, {
+        method: 'POST',
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create thread');
+    }
+    return await response.json();
 }
