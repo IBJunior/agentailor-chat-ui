@@ -1,12 +1,19 @@
 import type { Message } from "@/types/message";
 import { HumanMessage } from "./HumanMessage";
 import { AIMessage } from "./AIMessage";
+import { useEffect, useRef } from "react";
 
 interface MessageListProps {
   messages: Message[];
 }
 
 const MessageList = ({ messages }: MessageListProps) => {
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <div className="w-full max-w-3xl mx-auto px-4 space-y-4">
       {messages.map((message, index) =>
@@ -16,6 +23,7 @@ const MessageList = ({ messages }: MessageListProps) => {
           <AIMessage key={index} message={message} />
         )
       )}
+      <div ref={bottomRef} />
     </div>
   );
 };
