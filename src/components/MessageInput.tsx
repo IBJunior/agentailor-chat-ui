@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Loader2, SendIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => Promise<void>;
@@ -20,13 +22,12 @@ export const MessageInput = ({ onSendMessage, isLoading = false }: MessageInputP
   return (
     <div className="w-full max-w-3xl">
       <form onSubmit={handleSubmit} className="relative flex gap-2">
-        <div className="relative flex-1 group">
-          <textarea
+        <div className="relative flex-1">
+          <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message..."
-            className="w-full resize-none rounded-2xl bg-gray-100/50   p-6 focus:outline-none focus:ring-0 min-h-[60px] max-h-[200px] pr-16 transition-all duration-200 ease-in-out  border dark:text-black"
-            rows={1}
+            className="min-h-[60px] max-h-[200px] pr-16 resize-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
             disabled={isLoading}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -35,17 +36,19 @@ export const MessageInput = ({ onSendMessage, isLoading = false }: MessageInputP
               }
             }}
           />
-          <button
+          <Button
             type="submit"
+            size="icon"
             disabled={!message.trim() || isLoading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:opacity-90 transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
+            variant="default"
           >
             {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <SendIcon className="w-5 h-5" />
+              <SendIcon className="h-4 w-4" />
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

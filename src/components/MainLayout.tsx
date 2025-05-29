@@ -20,12 +20,14 @@ export function MainLayout({ children }: MainLayoutProps) {
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0">
-        <Header toggleSidebar={toggleSidebar} />
+        <div className="z-10">
+          <Header toggleSidebar={toggleSidebar} />
+        </div>
         
         {/* Main content */}
-        <main className="flex-1 overflow-auto ">
+        <div className="flex-1 relative h-[calc(100vh-4rem)]">
           {children}
-        </main>
+        </div>
       </div>
     </div>
   );

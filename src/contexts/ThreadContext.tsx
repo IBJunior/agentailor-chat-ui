@@ -25,7 +25,7 @@ interface ThreadProviderProps {
   threadId?: string;
 }
 
-export function ThreadProvider({ children, threadId = "default1" }: ThreadProviderProps) {
+export function ThreadProvider({ children, threadId = "default" }: ThreadProviderProps) {
   const {
     messages,
     isLoadingHistory,

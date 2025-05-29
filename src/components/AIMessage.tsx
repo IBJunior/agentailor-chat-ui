@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface AIMessageProps {
   message: Message;
@@ -12,11 +13,16 @@ interface AIMessageProps {
 export const AIMessage = ({ message }: AIMessageProps) => {
   return (
     <div className="flex gap-3">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-        <Bot className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+        <Bot className="h-5 w-5 text-primary" />
       </div>
       <div className="max-w-[80%]">
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-2">
+        <div
+          className={cn(
+            "rounded-2xl px-4 py-2",
+            "bg-muted/50 backdrop-blur-sm supports-[backdrop-filter]:bg-muted/30"
+          )}
+        >
           {message.content.map((content, i) => (
             <div key={i} className="prose dark:prose-invert max-w-none">
               {content.type === "text" && (
@@ -30,8 +36,10 @@ export const AIMessage = ({ message }: AIMessageProps) => {
               {content.type === "image_url" && content.imageUrl && (
                 <Image
                   src={content.imageUrl}
-                  alt="AI content"
-                  className="max-w-full rounded"
+                  alt="AI generated content"
+                  width={400}
+                  height={300}
+                  className="max-w-full rounded-lg"
                 />
               )}
             </div>

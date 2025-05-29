@@ -15,7 +15,7 @@ const MessageList = ({ messages }: MessageListProps) => {
   }, [messages]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 space-y-4">
+    <div className="w-full max-w-3xl mx-auto space-y-6">
       {messages.map((message, index) =>
         message.type === "human" ? (
           <HumanMessage key={index} message={message} />
@@ -23,7 +23,7 @@ const MessageList = ({ messages }: MessageListProps) => {
           <AIMessage key={index} message={message} />
         )
       )}
-      <div ref={bottomRef} />
+      <div ref={bottomRef} className="h-px" />
     </div>
   );
 };
