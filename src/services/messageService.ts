@@ -2,7 +2,7 @@ import type { Message, MessageDto, Thread } from "@/types/message";
 import { IChatService, ChatServiceConfig } from "./types";
 
 const DEFAULT_CONFIG: ChatServiceConfig = {
-    baseUrl: 'http://localhost:3001/api/agent',
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api/agent',
     endpoints: {
         history: '/history',
         chat: '/chat',

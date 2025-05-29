@@ -4,6 +4,7 @@ import MessageList from "./MessageList";
 import { useMessages } from "@/hooks/useMessages";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
+import { WelcomeSection } from "./WelcomeSection";
 
 interface ThreadProps {
   threadId: string;
@@ -54,6 +55,7 @@ export const Thread = ({ threadId, onFirstMessage }: ThreadProps) => {
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-3xl px-4">
+            <WelcomeSection />
             <MessageInput onSendMessage={handleSendMessage} isLoading={isSending} />
           </div>
         </div>
