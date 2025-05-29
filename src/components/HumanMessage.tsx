@@ -14,13 +14,13 @@ export const HumanMessage = ({ message }: HumanMessageProps) => {
         <div
           className={cn(
             "rounded-2xl px-4 py-2",
-            "bg-primary text-primary-foreground",
-            "shadow-sm hover:shadow-md transition-shadow duration-200"
+            "bg-gray-300/50 text-gray-800",
+            "backdrop-blur-sm supports-[backdrop-filter]:bg-gray-300/50"
           )}
         >
           {message.content.map((content, i) => (
-            <div key={i}>
-              {content.type === "text" && <p>{content.text}</p>}
+            <div key={i} className="prose dark:prose-invert max-w-none">
+              {content.type === "text" && <p className="my-0">{content.text}</p>}
               {content.type === "image_url" && content.imageUrl && (
                 <Image
                   src={content.imageUrl}

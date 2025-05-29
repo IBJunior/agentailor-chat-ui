@@ -19,7 +19,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       </Sidebar>
 
       {/* Main content area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 bg-gray-150">
         <div className="z-10">
           <Header toggleSidebar={toggleSidebar} />
         </div>

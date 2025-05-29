@@ -21,7 +21,7 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-semibold text-gray-800 hidden sm:block">
-                {'Agentailor'}
+                {'Agentailor Chat UI'}
               </span>
             </Link>
           </div>

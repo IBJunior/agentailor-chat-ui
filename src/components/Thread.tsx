@@ -19,7 +19,7 @@ export const Thread = () => {
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="absolute inset-0 flex flex-col ">
       {messages.length > 0 ? (
         <>
           <div className="flex-1 min-h-0">
