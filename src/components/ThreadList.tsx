@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { useThreads } from '@/hooks/useThreads';
 import { SquarePen } from 'lucide-react';

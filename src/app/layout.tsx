@@ -1,6 +1,8 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
+import { ChatServiceProvider } from "@/contexts/ChatServiceContext";
+import { ThreadProvider } from "@/contexts/ThreadContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,7 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <ChatServiceProvider>
+            <ThreadProvider>{children}</ThreadProvider>
+          </ChatServiceProvider>
         </QueryClientProvider>
       </body>
     </html>

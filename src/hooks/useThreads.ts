@@ -1,56 +1,66 @@
-import { useState, useCallback, useEffect } from 'react';
-import { fetchThreads, createNewThread } from '@/services/messageService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Thread } from '@/types/message';
-import { useRouter } from 'next/navigation';
+import { useChatService } from '@/contexts/ChatServiceContext';
+import { useThreadContext } from '@/contexts/ThreadContext';
+import { useEffect, useCallback } from 'react';
 
 export function useThreads() {
-  const [threads, setThreads] = useState<Thread[]>([]);
-  const [activeThreadId, setActiveThreadId] = useState<string>();
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const chatService = useChatService();
+  const queryClient = useQueryClient();
+  const { activeThreadId, setActiveThreadId } = useThreadContext();
 
-  const loadThreads = useCallback(async () => {
-    try {
-      const loadedThreads = await fetchThreads();
-      setThreads(loadedThreads);
-      if (loadedThreads.length > 0 && !activeThreadId) {
-        setActiveThreadId(loadedThreads[0].id);
-      }
-    } catch (error) {
-      console.error('Failed to load threads:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [activeThreadId]);
+  const {
+    data: threads = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<Thread[]>({
+    queryKey: ['threads'],
+    queryFn: () => chatService.fetchThreads(),
+  });
 
+  const invalidateMessages = useCallback((threadId: string) => {
+    // Remove any existing messages from the cache
+    queryClient.removeQueries({
+      queryKey: ['messages', threadId]
+    });
+    // Force a refetch of messages for this thread
+    queryClient.fetchQuery({
+      queryKey: ['messages', threadId],
+      queryFn: () => chatService.fetchMessageHistory(threadId)
+    });
+  }, [queryClient, chatService]);
+
+  // If there's no active thread but we have threads, select the first one
   useEffect(() => {
-    loadThreads();
-  }, [loadThreads]);
-
-  const createThread = useCallback(async () => {
-    try {
-      const newThread = await createNewThread();
-      setThreads(prev => [newThread, ...prev]);
-      setActiveThreadId(newThread.id);
-      router.push(`/?thread=${newThread.id}`);
-      return newThread;
-    } catch (error) {
-      console.error('Failed to create thread:', error);
-      throw error;
+    if (!activeThreadId && threads.length > 0) {
+      const firstThreadId = threads[0].id;
+      setActiveThreadId(firstThreadId);
+      invalidateMessages(firstThreadId);
     }
-  }, [router]);
+  }, [activeThreadId, threads, setActiveThreadId, invalidateMessages]);
 
-  const switchThread = useCallback((threadId: string) => {
+  const createThread = async () => {
+    const newThread = await chatService.createNewThread();
+    queryClient.setQueryData(['threads'], (old: Thread[] = []) => [newThread, ...old]);
+    setActiveThreadId(newThread.id);
+    invalidateMessages(newThread.id);
+    return newThread;
+  };
+
+  const switchThread = (threadId: string) => {
+    console.log(`Switching to thread: ${threadId}`);
     setActiveThreadId(threadId);
-    router.push(`/?thread=${threadId}`);
-  }, [router]);
+    invalidateMessages(threadId);
+  };
 
   return {
     threads,
     activeThreadId,
     isLoading,
+    error: error as Error | null,
     createThread,
     switchThread,
-    refreshThreads: loadThreads,
+    refetchThreads: refetch,
   };
 }

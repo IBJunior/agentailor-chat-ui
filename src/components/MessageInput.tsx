@@ -29,7 +29,6 @@ export const MessageInput = ({ onSendMessage, isLoading = false }: MessageInputP
         className={cn(
           "min-h-[60px] max-h-[200px] pr-16 resize-none",
           "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-          "focus-visible:ring-primary/50"
         )}
         disabled={isLoading}
         onKeyDown={(e) => {

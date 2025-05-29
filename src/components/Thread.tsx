@@ -1,13 +1,16 @@
+"use client";
 import { MessageInput } from "./MessageInput";
 import MessageList from "./MessageList";
-import { useThread } from "@/contexts/ThreadContext";
+import { useMessages } from "@/hooks/useMessages";
+import { useThreadContext } from "@/contexts/ThreadContext";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
-import { Card } from "./ui/card";
-import { Separator } from "./ui/separator";
 
 export const Thread = () => {
-  const { messages, isLoading, isLoadingHistory, sendMessage } = useThread();
+  const { activeThreadId } = useThreadContext();
+
+
+  const { messages, isLoadingHistory, isSending, sendMessage } = useMessages(activeThreadId);
 
   if (isLoadingHistory) {
     return (
@@ -19,7 +22,7 @@ export const Thread = () => {
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col ">
+    <div className="absolute inset-0 flex flex-col">
       {messages.length > 0 ? (
         <>
           <div className="flex-1 min-h-0">
@@ -32,7 +35,7 @@ export const Thread = () => {
           <div className="flex-shrink-0">
             <div className="p-4 w-full pb-6">
               <div className="mx-auto max-w-3xl">
-                <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+                <MessageInput onSendMessage={sendMessage} isLoading={isSending} />
               </div>
             </div>
           </div>
@@ -40,7 +43,7 @@ export const Thread = () => {
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-3xl px-4">
-            <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+            <MessageInput onSendMessage={sendMessage} isLoading={isSending} />
           </div>
         </div>
       )}

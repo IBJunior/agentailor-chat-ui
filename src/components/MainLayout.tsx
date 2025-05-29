@@ -1,3 +1,4 @@
+"use client";
 import { ReactNode } from 'react';
 import { ThreadList } from './ThreadList';
 import { useUIStore } from '@/store/uiStore';
