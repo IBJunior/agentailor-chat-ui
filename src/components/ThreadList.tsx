@@ -3,15 +3,19 @@
 import { useState } from 'react';
 import { useThreads } from '@/hooks/useThreads';
 import { SquarePen } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 
 export function ThreadList() {
-  const { threads, activeThreadId, createThread, switchThread } = useThreads();
+  const { threads, createThread } = useThreads();
   const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleCreateThread = async () => {
     setIsCreating(true);
     try {
-      await createThread();
+      const newThread = await createThread();
+      router.push(`/thread/${newThread.id}`);
     } finally {
       setIsCreating(false);
     }
@@ -32,11 +36,10 @@ export function ThreadList() {
       <div className="flex-1 overflow-y-auto">
         <div className="px-2 space-y-1">
           {threads.map((thread) => (
-            <button
-              key={thread.id}
-              onClick={() => switchThread(thread.id)}
+            <button              key={thread.id}
+              onClick={() => router.push(`/thread/${thread.id}`)}
               className={`w-full flex flex-col items-start text-left px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 transition-colors cursor-pointer ${
-                thread.id === activeThreadId
+                pathname === `/thread/${thread.id}`
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
               }`}

@@ -13,14 +13,22 @@ const MessageList = ({ messages }: MessageListProps) => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+  // Deduplicate messages by ID
+  const uniqueMessages = messages.reduce((acc: Message[], message) => {
+    const isDuplicate = acc.some(m => m.id === message.id);
+    if (!isDuplicate) {
+      acc.push(message);
+    }
+    return acc;
+  }, []);
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
-      {messages.map((message, index) =>
+      {uniqueMessages.map((message) =>
         message.type === "human" ? (
-          <HumanMessage key={index} message={message} />
+          <HumanMessage key={message.id} message={message} />
         ) : (
-          <AIMessage key={index} message={message} />
+          <AIMessage key={message.id} message={message} />
         )
       )}
       <div ref={bottomRef} className="h-px" />

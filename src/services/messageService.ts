@@ -65,12 +65,10 @@ export class DefaultChatService implements IChatService {
             type: data.type,
             content: Array.isArray(data.content) ? data.content : [{ type: 'text', text: String(data.content) }]
         };
-    }
-
-    createMessageStream(threadId: string, message: string): EventSource {
-        const params = new URLSearchParams({ content: message, threadId, type: "human" });
-        return new EventSource(`${this.getUrl('stream')}?${params}`, {
-            withCredentials: true
+    }    createMessageStream(threadId: string, message: string): EventSource {
+        const params = new URLSearchParams({ content: message, threadId });
+        return new EventSource(`${this.getUrl('stream')}?${params}`,{
+           // withCredentials: true,
         });
     }
 

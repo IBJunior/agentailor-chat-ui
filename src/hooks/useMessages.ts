@@ -3,6 +3,10 @@ import { useCallback, useRef, useEffect, useState } from "react";
 import type { Message, SseMessageData, MessageContentDto } from "@/types/message";
 import { useChatService } from "@/contexts/ChatServiceContext";
 
+interface UseMessagesOptions {
+  skipLocalUpdate?: boolean;
+}
+
 interface UseMessagesReturn {
   messages: Message[];
   isLoadingHistory: boolean;
@@ -13,7 +17,7 @@ interface UseMessagesReturn {
   refetchMessages: () => Promise<void>;
 }
 
-export function useMessages(threadId: string | null): UseMessagesReturn {
+export function useMessages(threadId: string | null, options: UseMessagesOptions = {}): UseMessagesReturn {
   const chatService = useChatService();
   const queryClient = useQueryClient();
   const streamRef = useRef<any>(null);
@@ -44,17 +48,17 @@ export function useMessages(threadId: string | null): UseMessagesReturn {
     const threadIdToUse = threadId || crypto.randomUUID();
 
     setIsSending(true);
-    setSendError(null);
-    
-    try {
-      // Add user message to the chat immediately
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        type: 'human',
-        content: [{ type: 'text', text: messageText }]
-      };
+    setSendError(null);      try {      if (!options.skipLocalUpdate) {
+        // Use a temporary frontend ID for immediate display
+        const tempId = `temp-${Date.now()}`;
+        const userMessage: Message = {
+          id: tempId,
+          type: 'human',
+          content: [{ type: 'text', text: messageText }]
+        };
 
-      queryClient.setQueryData(['messages', threadId], (old: Message[] = []) => [...old, userMessage]);
+        queryClient.setQueryData(['messages', threadIdToUse], (old: Message[] = []) => [...old, userMessage]);
+      }
 
       // Close any existing stream
       if (streamRef.current) {
@@ -68,13 +72,11 @@ export function useMessages(threadId: string | null): UseMessagesReturn {
       if ('onmessage' in stream) {
         stream.onmessage = (event: MessageEvent) => {
           try {
-            const data = JSON.parse(event.data) as SseMessageData;
-
-            // If we don't have a current message or the ID changed, create a new message
+            const data = JSON.parse(event.data) as SseMessageData;            // If we don't have a current message or the ID changed, create a new message
             if (!currentMessageRef.current || currentMessageRef.current.id !== data.id) {
               const newContent: MessageContentDto = { type: 'text', text: data.content };
               currentMessageRef.current = {
-                id: data.id,
+                id: data.id, // Use the ID from the backend
                 type: data.type,
                 content: [newContent]
               };
