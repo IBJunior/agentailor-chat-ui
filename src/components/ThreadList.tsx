@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { useThreads } from '@/hooks/useThreads';
+import { useChat } from '@/hooks/useChat';
 import { SquarePen } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 
 export function ThreadList() {
-  const { threads, createThread } = useThreads();
+  const { threads, createThread } = useChat();
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -47,11 +47,6 @@ export function ThreadList() {
               <div className="text-sm font-medium truncate w-full">
                 {thread.title || `Thread ${thread.id.slice(0, 8)}`}
               </div>
-              {thread.lastMessage && (
-                <div className="text-xs text-gray-500 dark:text-gray-400 truncate w-full mt-0.5">
-                  {thread.lastMessage}
-                </div>
-              )}
             </button>
           ))}
         </div>

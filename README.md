@@ -38,6 +38,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 The chat UI is designed to work with any backend implementation. Just implement the `IChatService` interface:
 
+> 💡 Don't have a backend yet? Create a fully compatible NestJS + LangGraph backend for free at [initializr.agentailor.com](https://initializr.agentailor.com)
+
 ```typescript
 interface IChatService {
   // Fetch message history for a thread

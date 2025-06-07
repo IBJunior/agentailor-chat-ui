@@ -26,7 +26,6 @@ export interface SseMessageData {
 export interface Thread {
   id: string;
   title?: string;
-  lastMessage?: string;
   createdAt: string;
   updatedAt: string;
 }

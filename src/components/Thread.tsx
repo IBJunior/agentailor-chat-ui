@@ -1,27 +1,19 @@
 "use client";
 import { MessageInput } from "./MessageInput";
 import MessageList from "./MessageList";
-import { useMessages } from "@/hooks/useMessages";
+import { useChat } from "@/hooks/useChat";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { WelcomeSection } from "./WelcomeSection";
 
 interface ThreadProps {
   threadId: string;
-  onFirstMessage?: (message: string) => Promise<void>;
 }
 
-export const Thread = ({ threadId, onFirstMessage }: ThreadProps) => {
-  const { messages, isLoadingHistory, isSending, sendMessage } = useMessages(threadId, {
-    skipLocalUpdate: !!onFirstMessage
-  });
-
+export const Thread = ({ threadId }: ThreadProps) => {
+  const { messages, isLoadingHistory, isSending, sendMessage, switchThread } = useChat(threadId);
   const handleSendMessage = async (message: string) => {
-    if (onFirstMessage) {
-      await onFirstMessage(message);
-    } else {
-      await sendMessage(message);
-    }
+    await sendMessage(message);
   };
 
   if (isLoadingHistory) {
