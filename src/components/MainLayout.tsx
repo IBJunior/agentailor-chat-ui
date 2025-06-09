@@ -1,8 +1,9 @@
+"use client";
 import { ReactNode } from 'react';
-import { Header } from './Header';
 import { ThreadList } from './ThreadList';
 import { useUIStore } from '@/store/uiStore';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Sidebar from './Sidebar';
+import Header from './Header';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -12,44 +13,22 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { isSidebarOpen, toggleSidebar } = useUIStore();
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 w-64 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
+      <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar}>
         <ThreadList />
-      </aside>
+      </Sidebar>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="sticky top-0 z-40">
-          <Header>
-            <button
-              onClick={toggleSidebar}
-              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-            >
-              {isSidebarOpen ? (
-                <XMarkIcon className="w-6 h-6" />
-              ) : (
-                <Bars3Icon className="w-6 h-6" />
-              )}
-            </button>
-          </Header>
+      <div className="flex flex-col flex-1 min-w-0 bg-gray-150">
+        <div className="z-10">
+          <Header toggleSidebar={toggleSidebar} />
         </div>
-
+        
         {/* Main content */}
-        <main className="flex-1 overflow-auto">{children}</main>
-
-        {/* Mobile overlay */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-            onClick={() => useUIStore.getState().setSidebarOpen(false)}
-          />
-        )}
+        <div className="flex-1 relative h-[calc(100vh-4rem)]">
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -1,49 +1,27 @@
-import { createContext, useContext, ReactNode } from "react";
-import type { Message } from "@/types/message";
-import { useMessages } from "@/hooks/useMessages";
+import React, { createContext, useContext, useState } from 'react';
+import { Thread } from '@/types/message';
 
 interface ThreadContextType {
-  messages: Message[];
-  isLoading: boolean;
-  isLoadingHistory: boolean;
-  threadId: string;
-  sendMessage: (messageText: string) => Promise<void>;
+  activeThreadId: string | null;
+  setActiveThreadId: (threadId: string) => void;
 }
 
-const ThreadContext = createContext<ThreadContextType | undefined>(undefined);
+const ThreadContext = createContext<ThreadContextType | null>(null);
 
-export function useThread() {
-  const context = useContext(ThreadContext);
-  if (!context) {
-    throw new Error('useThread must be used within a ThreadProvider');
-  }
-  return context;
-}
-
-interface ThreadProviderProps {
-  children: ReactNode;
-  threadId?: string;
-}
-
-export function ThreadProvider({ children, threadId = "default" }: ThreadProviderProps) {
-  const {
-    messages,
-    isLoadingHistory,
-    isSending,
-    sendMessage
-  } = useMessages(threadId);
+export function ThreadProvider({ children }: { children: React.ReactNode }) {
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
   return (
-    <ThreadContext.Provider 
-      value={{
-        messages,
-        isLoading: isSending,
-        isLoadingHistory,
-        threadId,
-        sendMessage,
-      }}
-    >
+    <ThreadContext.Provider value={{ activeThreadId, setActiveThreadId }}>
       {children}
     </ThreadContext.Provider>
   );
+}
+
+export function useThreadContext() {
+  const context = useContext(ThreadContext);
+  if (!context) {
+    throw new Error('useThreadContext must be used within a ThreadProvider');
+  }
+  return context;
 }
