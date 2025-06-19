@@ -22,7 +22,7 @@ pnpm install
 
 2. Configure your backend URL:
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://your-backend-url/api
+NEXT_PUBLIC_API_BASE_URL=http://your-backend-url/api/agent
 ```
 
 3. Run the development server:
