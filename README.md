@@ -2,6 +2,13 @@
 
 A backend-agnostic chat UI built with Next.js and React that supports real-time messaging, thread management, and streaming responses.
 
+## Demo
+
+<video src="docs/chat-ui-demo.mp4" controls width="600" poster="public/next.svg">
+  Your browser does not support the video tag. 
+  <a href="docs/chat-ui-demo.mp4">Watch the demo video</a>
+</video>
+
 ## Features
 
 - 🌐 Backend agnostic - integrate with any chat backend
