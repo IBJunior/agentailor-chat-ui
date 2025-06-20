@@ -4,9 +4,7 @@ A backend-agnostic chat UI built with Next.js and React that supports real-time 
 
 ## Demo
 
-[![Chat UI Demo](public/next.svg)](docs/chat-ui-demo.mp4)
-
-> 📹 [Watch the demo video](docs/chat-ui-demo.mp4)
+> 📹 [Watch the demo video](https://www.youtube.com/watch?v=PrR77GmpQ-E)
 
 ## Features
 
